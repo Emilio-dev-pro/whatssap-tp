@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <!-- Permet d'utiliser un runtime .NET plus récent (10, 11…) si le runtime 8 n'est pas installé. -->
+    <RollForward>LatestMajor</RollForward>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CaramelChat</RootNamespace>
+    <AssemblyName>vibeChat</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\whatsup.ico</ApplicationIcon>
+    <UserSecretsId>caramelchat-lan-2026</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Le SDK Windows Desktop remplace les usings implicites du SDK Web. -->
+    <Using Include="System.IO" />
+    <Using Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
+  </ItemGroup>
+
+  <!-- L’interface est servie depuis le dossier de l’exécutable (ContentRootPath). -->
+  <ItemGroup>
+    <Content Update="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Pont Python d'Argos Translate (traduction hors ligne) et script d'installation. -->
+    <None Update="tools\**" CopyToOutputDirectory="PreserveNewest" />
+    <Resource Include="Assets\whatsup.ico" />
+  </ItemGroup>
+
+</Project>

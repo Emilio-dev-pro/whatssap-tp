@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111b21">
+  <title>vibeChat</title>
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="shell">
+
+  <!-- ------------------------------------------------------------ Title bar -->
+  <header class="titlebar">
+    <span class="brand">
+      <svg class="brand-logo" viewBox="0 0 32 32" aria-hidden="true">
+        <path fill="#00a884" d="M5.6 4.4h20.8a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3h-9.2L11.4 26v-4.6H5.6a3 3 0 0 1-3-3v-11a3 3 0 0 1 3-3Z"></path>
+        <path fill="#0b141a" d="M10.9 8.6h1.7l1.2 3-1.4 1a9 9 0 0 0 4.4 4.4l1-1.5 3 1.2v1.7a1.5 1.5 0 0 1-1.7 1.5 12.5 12.5 0 0 1-11.1-11.1 1.5 1.5 0 0 1 1.5-1.7Z"></path>
+      </svg>
+      <span class="brand-name">vibeChat</span>
+    </span>
+
+    <div class="win-controls" id="winControls" aria-hidden="true">
+      <button class="win-btn" data-win="minimize" type="button" title="Réduire" aria-label="Réduire">
+        <svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="M0 5h10" stroke="currentColor" stroke-width="1"></path></svg>
+      </button>
+      <button class="win-btn" data-win="maximize" type="button" title="Agrandir" aria-label="Agrandir">
+        <svg class="win-max" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><rect x=".5" y=".5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1"></rect></svg>
+        <svg class="win-restore" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><rect x=".5" y="2.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1"></rect><path d="M2.5 2.5V.5h7v7h-2" fill="none" stroke="currentColor" stroke-width="1"></path></svg>
+      </button>
+      <button class="win-btn close" data-win="close" type="button" title="Fermer" aria-label="Fermer">
+        <svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true"><path d="m0 0 10 10M10 0 0 10" stroke="currentColor" stroke-width="1"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="app">
+
+    <!-- ---------------------------------------------------------------- Rail -->
+    <nav class="rail" aria-label="Navigation principale">
+      <button class="rail-btn active" data-view="chats" type="button" title="Discussions" aria-label="Discussions">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3.6c-4.7 0-8.4 3.4-8.4 7.6 0 2.3 1.1 4.4 3 5.8l-.8 3.2 3.5-1.4c.9.2 1.8.3 2.7.3 4.7 0 8.4-3.4 8.4-7.6S16.7 3.6 12 3.6Z"></path>
+        </svg>
+        <span class="rail-badge hidden" id="railUnread">0</span>
+      </button>
+
+      <button class="rail-btn" data-view="calls" type="button" title="Appels" aria-label="Appels">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.6 3.5h2.2l1.6 4-1.9 1.4a12 12 0 0 0 5.8 5.8l1.4-1.9 4 1.6v2.2a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"></path>
+        </svg>
+      </button>
+
+      <button class="rail-btn" data-view="statuses" type="button" title="Statuts" aria-label="Statuts">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="8.4" stroke-dasharray="3.4 2.6"></circle>
+          <circle cx="12" cy="12" r="4.2"></circle>
+        </svg>
+        <span class="rail-badge hidden" id="railStatus">0</span>
+      </button>
+
+      <button class="rail-btn" data-view="contacts" type="button" title="Postes du réseau" aria-label="Postes du réseau">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="8" r="3.4"></circle>
+          <path d="M2.8 20a6.5 6.5 0 0 1 12.4 0"></path>
+          <path d="M16.5 5.2a3.2 3.2 0 0 1 0 6.2"></path>
+          <path d="M17.6 14.6A6 6 0 0 1 21.4 20"></path>
+        </svg>
+      </button>
+
+      <span class="rail-spacer"></span>
+
+      <button class="avatar avatar-me rail-avatar" id="myAvatar" type="button" title="Changer ma photo de profil" aria-label="Changer ma photo de profil"></button>
+    </nav>
+
+    <!-- --------------------------------------------------------------- Panel -->
+    <aside class="panel">
+
+      <!-- Discussions -->
+      <section class="view" id="chatsView">
+        <header class="view-head">
+          <h1>Discussions</h1>
+          <button class="round-green" id="newChatBtn" type="button" title="Nouvelle discussion" aria-label="Nouvelle discussion">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="chatsMenuBtn" type="button" title="Menu" aria-label="Menu">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+              <circle cx="12" cy="5" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="12" cy="19" r="1.8"></circle>
+            </svg>
+          </button>
+          <div class="dropdown hidden" id="chatsMenu">
+            <button type="button" data-chats-menu="profile">Mon profil</button>
+            <button type="button" data-chats-menu="theme">Changer de thème</button>
+          </div>
+        </header>
+
+        <div class="search-pill">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.4-3.4"></path>
+          </svg>
+          <input id="searchInput" type="search" placeholder="Rechercher ou démarrer une discussion" autocomplete="off">
+        </div>
+
+        <div class="filters" id="chatFilters">
+          <button class="chip active" data-filter="all" type="button">Toutes</button>
+          <button class="chip" data-filter="unread" type="button"><span id="unreadFilterLabel">Non lues</span></button>
+        </div>
+
+        <div class="list-scroll">
+          <div class="conversation-list" id="conversationList"></div>
+        </div>
+      </section>
+
+      <!-- Appels -->
+      <section class="view hidden" id="callsView">
+        <header class="view-head">
+          <h1>Appels</h1>
+          <button class="round-green" id="callsStartBtn" type="button" title="Démarrer un appel" aria-label="Démarrer un appel">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.4 3.2h2.3l1.6 4.1-2 1.4a12.2 12.2 0 0 0 5.9 5.9l1.4-2 4.1 1.6v2.3a2 2 0 0 1-2.2 2A16.6 16.6 0 0 1 4.4 5.4a2 2 0 0 1 2-2.2Z"></path>
+              <path d="M16.5 3.5v5M14 6h5"></path>
+            </svg>
+          </button>
+        </header>
+
+        <div class="search-pill">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.4-3.4"></path>
+          </svg>
+          <input id="callsSearch" type="search" placeholder="Rechercher un appel" autocomplete="off">
+        </div>
+
+        <div class="list-scroll">
+          <div class="section-title" id="callsTitle">
+            <span>Récents</span>
+            <button class="text-btn small" id="clearCallsBtn" type="button">Effacer l'historique</button>
+          </div>
+          <div class="calls-list" id="callsList"></div>
+          <p class="empty-hint hidden" id="callsEmpty">Aucun appel pour le moment. Utilisez le bouton vert pour appeler un poste du réseau.</p>
+        </div>
+
+        <div class="view-foot">🔒 Vos appels passent directement d'un poste à l'autre (WebRTC).</div>
+      </section>
+
+      <!-- Statuts -->
+      <section class="view hidden" id="statusesView">
+        <header class="view-head">
+          <h1>Statuts</h1>
+          <button class="round-green" id="newStatusBtn" type="button" title="Créer un statut" aria-label="Créer un statut">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
+          </button>
+        </header>
+
+        <div class="list-scroll">
+          <button class="status-row" id="myStatusRow" type="button">
+            <span class="avatar status-avatar" id="myStatusAvatar">
+              <span class="status-ring" id="myStatusRing"></span>
+            </span>
+            <span class="status-body">
+              <span class="status-name">Mon statut</span>
+              <span class="status-line" id="myStatusLine">Ajouter un statut</span>
+            </span>
+            <span class="status-add" id="myStatusAdd">+</span>
+          </button>
+
+          <div class="section-title">
+            <span>Mises à jour récentes</span>
+            <span class="count" id="statusCount">0</span>
+          </div>
+          <div class="status-list" id="statusList"></div>
+          <p class="empty-hint" id="statusEmpty">Les statuts des postes du réseau apparaissent ici. Ils expirent au bout de 24 heures.</p>
+
+          <div id="statusViewedWrap" class="hidden">
+            <div class="section-title"><span>Vus</span></div>
+            <div class="status-list" id="statusViewedList"></div>
+          </div>
+        </div>
+
+        <div class="view-foot">Vos statuts expirent au bout de 24 h. Les contacts masqués ne les voient pas.</div>
+      </section>
+
+      <!-- Contacts -->
+      <section class="view hidden" id="contactsView">
+        <header class="view-head">
+          <h1>Contacts</h1>
+        </header>
+
+        <div class="search-pill">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.4-3.4"></path>
+          </svg>
+          <input id="contactsSearch" type="search" placeholder="Rechercher un poste" autocomplete="off">
+        </div>
+
+        <div class="list-scroll">
+          <div class="section-title">
+            <span>Contacts du réseau</span>
+            <span class="count" id="peerCount">0</span>
+          </div>
+          <div class="peer-list" id="peerList"></div>
+
+          <div id="blockedWrap" class="hidden">
+            <div class="section-title"><span>Bloqués</span><span class="count" id="blockedCount">0</span></div>
+            <div class="blocked-list" id="blockedList"></div>
+          </div>
+        </div>
+
+        <div class="view-foot" id="footStatus">Découverte automatique…</div>
+      </section>
+
+      <footer class="panel-foot">
+        <div class="foot-me">
+          <span class="dot-online"></span>
+          <span class="me-name" id="myName">Chargement…</span>
+          <button class="icon-btn tiny" id="editNameBtn" type="button" title="Modifier mon nom" aria-label="Modifier mon nom">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="foot-meta">
+          <span class="badge" id="onlineBadge">0 en ligne</span>
+        </div>
+      </footer>
+    </aside>
+
+    <!-- ---------------------------------------------------------------- Chat -->
+    <main class="chat">
+
+      <!-- Accueil (aucune discussion ouverte) -->
+      <section class="hero" id="welcome">
+        <div class="hero-inner">
+          <div class="welcome-logo">
+            <svg viewBox="0 0 64 64" width="86" height="86" aria-hidden="true">
+              <rect width="64" height="64" rx="16" fill="#00a884"></rect>
+              <path fill="#ffffff" d="M13 14h38a6 6 0 0 1 6 6v17a6 6 0 0 1-6 6H32l-11 8v-8h-8a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6Z"></path>
+              <g transform="translate(16 15) scale(1.35)">
+                <path fill="#00a884" d="M6.6 3.5h2.2l1.6 4-1.9 1.4a12 12 0 0 0 5.8 5.8l1.4-1.9 4 1.6v2.2a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"></path>
+              </g>
+            </svg>
+          </div>
+          <h2>Bienvenue sur vibeChat</h2>
+          <p class="hero-lead">Messagerie, photos, vidéos, vocaux, statuts et appels entre les postes de votre réseau local. Sélectionnez une discussion à gauche pour commencer.</p>
+          <ul class="hero-list">
+            <li>Messages, photos, vidéos et vocaux, avec annulation avant distribution</li>
+            <li>Statuts texte, photo et vidéo, visibles par les postes du réseau</li>
+            <li>Blocage d'un contact et masquage de vos statuts, réversibles à tout moment</li>
+            <li>Appels audio et vidéo, photos de profil, indicateur « écrit… »</li>
+          </ul>
+          <p class="hero-foot" id="welcomeFoot"></p>
+        </div>
+      </section>
+
+      <!-- Appels : panneau de droite -->
+      <section class="hero hidden" id="callsHero">
+        <div class="hero-inner">
+          <div class="calls-card">
+            <svg class="calls-illustration" viewBox="0 0 220 160" width="220" height="160" aria-hidden="true">
+              <rect x="30" y="22" width="160" height="104" rx="12" fill="#e9edef"></rect>
+              <rect x="40" y="32" width="140" height="84" rx="8" fill="#111b21"></rect>
+              <rect x="78" y="42" width="64" height="64" rx="6" fill="#00a884"></rect>
+              <path d="M96 58h10l3 7-5 4a23 23 0 0 0 10 10l4-5 7 3v8a6 6 0 0 1-6 6 36 36 0 0 1-30-30 6 6 0 0 1 6-6Z" fill="#0b141a"></path>
+              <path d="M46 47h24M46 58h24M46 69h16" stroke="#2a3942" stroke-width="5" stroke-linecap="round"></path>
+              <rect x="52" y="126" width="116" height="7" rx="3.5" fill="#8696a0"></rect>
+            </svg>
+            <h2>Appels vocaux et vidéo</h2>
+            <p>Échangez avec un poste du réseau local, avec votre micro et votre webcam. La sonnerie et la tonalité de retour sont identiques à celles de WhatsApp.</p>
+          </div>
+
+          <div class="calls-actions">
+            <button class="calls-action" id="heroAudioBtn" type="button">
+              <span class="round-lg primary">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6.6 3.5h2.2l1.6 4-1.9 1.4a12 12 0 0 0 5.8 5.8l1.4-1.9 4 1.6v2.2a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"></path>
+                </svg>
+              </span>
+              <span>Appel audio</span>
+            </button>
+            <button class="calls-action" id="heroVideoBtn" type="button">
+              <span class="round-lg">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2.5" y="6" width="13" height="12" rx="3"></rect>
+                  <path d="m15.5 12 6-3.5v7z"></path>
+                </svg>
+              </span>
+              <span>Appel vidéo</span>
+            </button>
+          </div>
+
+          <p class="hero-note" id="callsSecureNote">Le microphone exige une origine sécurisée : ouvrez l'adresse HTTPS du poste pour appeler.</p>
+        </div>
+      </section>
+
+      <!-- Statuts : panneau de droite -->
+      <section class="hero hidden" id="statusesHero">
+        <div class="hero-inner">
+          <h2>Statuts</h2>
+          <p class="hero-lead">Partagez un texte sur un fond de couleur, une photo ou une vidéo. Les statuts sont visibles par tous les postes du réseau, sauf par les contacts que vous masquez.</p>
+          <ul class="hero-list">
+            <li>Texte sur fond de couleur, comme dans WhatsApp</li>
+            <li>Photo ou vidéo avec légende</li>
+            <li>Vues par contact, expiration automatique après 24 heures</li>
+            <li>Les contacts masqués ne voient pas vos statuts ; les contacts bloqués ne peuvent pas vous écrire</li>
+          </ul>
+          <div class="hero-actions">
+            <button class="text-btn primary" id="heroStatusBtn" type="button">Créer un statut</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contacts : panneau de droite -->
+      <section class="hero hidden" id="contactsHero">
+        <div class="hero-inner">
+          <h2>Postes détectés</h2>
+          <p class="hero-lead">vibeChat retrouve automatiquement les autres postes et vous laisse discuter, partager des médias et passer des appels. Cliquez sur un contact pour ouvrir la discussion.</p>
+          <ul class="hero-list">
+            <li>Messages, photos, vidéos et vocaux en un clic</li>
+            <li>Médias éphémères « vue unique »</li>
+            <li>Flammes quotidiennes avec vos contacts</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Discussion ouverte -->
+      <section class="chat-panel hidden" id="chatPanel">
+        <header class="chat-top">
+          <button class="icon-btn ghost chat-back" id="backBtn" type="button" title="Retour aux discussions" aria-label="Retour aux discussions">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 12H5"></path>
+              <path d="m11 6-6 6 6 6"></path>
+            </svg>
+          </button>
+          <div class="avatar avatar-peer" id="peerAvatar"></div>
+          <div class="peer-meta">
+            <div class="peer-title" id="peerTitle">—</div>
+            <div class="peer-sub" id="peerSubtitle">—</div>
+          </div>
+          <button class="icon-btn translate-btn" id="chatTranslateBtn" type="button" title="Traduire la conversation" aria-label="Traduire la conversation">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8.4"></circle>
+              <path d="M3.6 12h16.8M12 3.6c2.3 2.4 3.4 5.3 3.4 8.4S14.3 18 12 20.4C9.7 18 8.6 15.1 8.6 12S9.7 6 12 3.6Z"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="audioCallBtn" type="button" title="Appel audio" aria-label="Appel audio">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6.6 3.5h2.2l1.6 4-1.9 1.4a12 12 0 0 0 5.8 5.8l1.4-1.9 4 1.6v2.2a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="videoCallBtn" type="button" title="Appel vidéo" aria-label="Appel vidéo">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="6" width="13" height="12" rx="3"></rect>
+              <path d="m15.5 12 6-3.5v7z"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="chatSearchBtn" type="button" title="Rechercher dans la discussion" aria-label="Rechercher dans la discussion">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3.4-3.4"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" id="contactMenuBtn" type="button" title="Infos et blocage du contact" aria-label="Infos et blocage du contact">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">
+              <circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle>
+            </svg>
+          </button>
+        </header>
+
+        <div class="chat-search hidden" id="chatSearchBar">
+          <div class="chat-search-field">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3.4-3.4"></path>
+            </svg>
+            <input id="chatSearchInput" type="search" placeholder="Rechercher dans la conversation" autocomplete="off">
+            <span class="chat-search-count" id="chatSearchCount"></span>
+          </div>
+          <button class="icon-btn ghost small" id="chatSearchPrev" type="button" title="Résultat précédent" aria-label="Résultat précédent">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"></path></svg>
+          </button>
+          <button class="icon-btn ghost small" id="chatSearchNext" type="button" title="Résultat suivant" aria-label="Résultat suivant">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+          </button>
+          <button class="icon-btn ghost small" id="chatSearchClose" type="button" title="Fermer la recherche" aria-label="Fermer la recherche">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="blocked-banner hidden" id="blockedBanner">
+          <span>Vous avez bloqué ce contact : il ne peut plus vous écrire ni vous appeler.</span>
+          <button class="text-btn primary" id="unblockChatBtn" type="button">Débloquer</button>
+        </div>
+
+        <div class="record-bar hidden" id="recordBar">
+          <span class="record-dot"></span>
+          <span class="record-label">Enregistrement</span>
+          <span class="record-time" id="recordTime">0:00</span>
+          <div class="record-actions">
+            <button class="text-btn" id="cancelRecordBtn" type="button">Annuler</button>
+            <button class="text-btn primary" id="stopRecordBtn" type="button">Envoyer</button>
+          </div>
+        </div>
+
+        <footer class="composer">
+          <input id="imageInput" type="file" accept="image/*,video/*" hidden>
+          <input id="videoInput" type="file" accept="video/*" hidden>
+          <input id="fileInput" type="file" hidden>
+          <input id="audioInput" type="file" accept="audio/*" hidden>
+
+          <button class="icon-btn translate-btn" id="composerTranslateBtn" type="button" title="Traduire avant l'envoi" aria-label="Traduire avant l'envoi">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8.4"></circle>
+              <path d="M3.6 12h16.8M12 3.6c2.3 2.4 3.4 5.3 3.4 8.4S14.3 18 12 20.4C9.7 18 8.6 15.1 8.6 12S9.7 6 12 3.6Z"></path>
+            </svg>
+          </button>
+
+          <div class="attach-wrap">
+            <button class="icon-btn" id="attachBtn" type="button" title="Joindre" aria-label="Joindre un fichier, une photo, une vidéo, un audio ou un sondage">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12.5 12.4 19a4.6 4.6 0 0 1-6.5-6.5l7.6-7.6a3.1 3.1 0 0 1 4.4 4.4l-7.6 7.6a1.6 1.6 0 0 1-2.3-2.3l6.6-6.6"></path>
+              </svg>
+            </button>
+
+            <div class="attach-menu hidden" id="attachMenu">
+              <button type="button" class="attach-toggle" id="viewOnceToggle" aria-pressed="false">
+                <span class="attach-icon view-once">👁</span>Vue unique<span class="attach-switch" id="viewOnceSwitch">Désactivée</span>
+              </button>
+              <button type="button" data-attach="media"><span class="attach-icon photo">🖼</span>Photos et vidéos</button>
+              <button type="button" data-attach="camera"><span class="attach-icon cam">📷</span>Caméra</button>
+              <button type="button" data-attach="document"><span class="attach-icon doc">📄</span>Document</button>
+              <button type="button" data-attach="audio"><span class="attach-icon audio">🎵</span>Audio</button>
+              <button type="button" data-attach="poll"><span class="attach-icon poll">📊</span>Sondage</button>
+            </div>
+          </div>
+
+          <textarea id="messageInput" rows="1" placeholder="Entrez un message" autocomplete="off"></textarea>
+
+          <button class="icon-btn" id="recordBtn" type="button" title="Enregistrer un message vocal" aria-label="Enregistrer un message vocal">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+              <path d="M5 11a7 7 0 0 0 14 0"></path>
+              <path d="M12 18v3"></path>
+            </svg>
+          </button>
+
+          <button class="send-btn" id="sendBtn" type="button" title="Envoyer le message" aria-label="Envoyer le message">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M3.3 3.2a1 1 0 0 1 1.1-.2l16 8a1 1 0 0 1 0 1.8l-16 8a1 1 0 0 1-1.4-1.1l1.5-6-7-2.2a1 1 0 0 1 0-1.9l7-2.2-1.5-6a1 1 0 0 1 .3-1Z"></path>
+            </svg>
+          </button>
+        </footer>
+
+        <div class="composer-hint">
+          <span id="sizeHint">Taille maximale par fichier : —</span>
+          <a class="secure-hint hidden" id="secureHint" href="#" target="_blank" rel="noopener">Activer le microphone (version sécurisée)</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------- Appel audio/vidéo -->
+<div class="call-layer hidden" id="callLayer">
+  <video class="call-remote hidden" id="callRemoteVideo" autoplay playsinline></video>
+  <div class="call-stage">
+    <div class="call-identity" id="callIdentity">
+      <div class="avatar call-avatar" id="callAvatar"></div>
+      <div class="call-name" id="callName">—</div>
+      <div class="call-status" id="callStatus">Appel en cours…</div>
+    </div>
+    <video class="call-local hidden" id="callLocalVideo" autoplay playsinline muted></video>
+    <div class="call-controls">
+      <button class="call-btn" id="callMuteBtn" type="button" title="Couper le micro" aria-label="Couper le micro">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+          <path d="M5 11a7 7 0 0 0 14 0"></path>
+          <path d="M12 18v3"></path>
+        </svg>
+      </button>
+      <button class="call-btn hidden" id="callCamBtn" type="button" title="Couper la caméra" aria-label="Couper la caméra">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="6" width="13" height="12" rx="3"></rect>
+          <path d="m15.5 12 6-3.5v7z"></path>
+        </svg>
+      </button>
+      <button class="call-btn accept hidden" id="callAcceptBtn" type="button" title="Répondre" aria-label="Répondre">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M6.6 3.5h2.2l1.6 4-1.9 1.4a12 12 0 0 0 5.8 5.8l1.4-1.9 4 1.6v2.2a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"></path>
+        </svg>
+      </button>
+      <button class="call-btn danger" id="callHangupBtn" type="button" title="Raccrocher" aria-label="Raccrocher">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 14a16.5 16.5 0 0 1 16 0v3.2a1 1 0 0 1-1.2 1l-3.5-.9a1 1 0 0 1-.8-1v-2a12 12 0 0 0-5 0v2a1 1 0 0 1-.8 1l-3.5.9a1 1 0 0 1-1.2-1Z"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------ Média en vue unique -->
+<div class="view-once-layer hidden" id="viewOnceViewer">
+  <header class="view-once-head">
+    <span class="view-once-badge">👁 Vue unique</span>
+    <button class="icon-btn" id="viewOnceClose" type="button" title="Fermer" aria-label="Fermer">✕</button>
+  </header>
+  <div class="view-once-stage" id="viewOnceStage"></div>
+  <p class="view-once-note">Ce média ne pourra plus être rouvert après l'avoir consulté.</p>
+</div>
+
+<!-- --------------------------------------------------- Visualiseur d'image -->
+<div class="media-viewer hidden" id="imageViewer">
+  <header class="media-viewer-head">
+    <button class="icon-btn" id="viewerClose" type="button" title="Fermer" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+    </button>
+    <div class="media-viewer-meta">
+      <div id="viewerTitle">Photo</div>
+      <div id="viewerTime"></div>
+    </div>
+    <button class="icon-btn" id="viewerOpen" type="button" title="Ouvrir dans une application" aria-label="Ouvrir dans une application">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"></path><path d="M20 4 10 14"></path><path d="M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"></path></svg>
+    </button>
+    <button class="icon-btn" id="viewerDownload" type="button" title="Télécharger" aria-label="Télécharger">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M4 20h16"></path></svg>
+    </button>
+  </header>
+  <div class="media-viewer-stage" id="viewerStage">
+    <img id="viewerImage" alt="Photo" draggable="false">
+  </div>
+</div>
+
+<!-- ---------------------------------------------------- Visualiseur de statut -->
+<div class="status-viewer hidden" id="statusViewer">
+  <div class="status-progress" id="statusProgress"></div>
+  <header class="status-viewer-head">
+    <span class="avatar small" id="statusViewerAvatar"></span>
+    <div class="status-viewer-meta">
+      <div id="statusViewerName">—</div>
+      <div id="statusViewerTime"></div>
+    </div>
+    <button class="icon-btn status-pause-top hidden" id="statusPauseTop" type="button" title="Mettre en pause (Espace)" aria-label="Mettre en pause (Espace)">
+      <svg class="pause-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+      <svg class="play-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 4.8v14.4L20 12Z"></path></svg>
+    </button>
+    <button class="icon-btn" id="statusViewerClose" type="button" title="Fermer" aria-label="Fermer">✕</button>
+  </header>
+
+  <div class="status-viewer-body">
+    <button class="status-nav prev" id="statusPrev" type="button" aria-label="Statut précédent"></button>
+    <div class="status-content" id="statusContent"></div>
+    <button class="status-nav next" id="statusNext" type="button" aria-label="Statut suivant"></button>
+  </div>
+
+  <footer class="status-viewer-foot">
+    <p id="statusViewerCaption"></p>
+    <div class="status-react-row" id="statusReactRow">
+      <button class="status-like-btn" id="statusLikeBtn" type="button" title="J'aime ce statut" aria-label="J'aime ce statut">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 20.3 4.9 13a4.7 4.7 0 0 1 6.6-6.6l.5.5.5-.5A4.7 4.7 0 0 1 19.1 13Z"></path></svg>
+        <span id="statusLikeCount">0</span>
+      </button>
+      <input id="statusCommentInput" type="text" maxlength="500" placeholder="Commenter ce statut…" autocomplete="off">
+      <button class="text-btn primary" id="statusCommentSend" type="button">Envoyer</button>
+    </div>
+    <div class="status-own-note" id="statusOwnNote">
+      <span>👁 <span id="statusOwnViews">0</span> vue(s)</span>
+      <button class="text-btn" id="statusOpenViewersTop" type="button">Voir les vues</button>
+    </div>
+    <button class="status-views-btn hidden" id="statusViewsBtn" type="button">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+      <span id="statusViewerViews">0</span>
+    </button>
+  </footer>
+
+  <div class="status-viewers hidden" id="statusViewersPanel">
+    <header><h3>Activité du statut</h3><button class="icon-btn" id="statusViewersClose" type="button" aria-label="Fermer">✕</button></header>
+    <div class="status-panel-section">
+      <div class="section-title"><span>J'aime</span><span class="count" id="statusLikesCount">0</span></div>
+      <div id="statusLikesList"></div>
+    </div>
+    <div class="status-panel-section">
+      <div class="section-title"><span>Commentaires</span><span class="count" id="statusCommentsCount">0</span></div>
+      <div id="statusCommentsList"></div>
+    </div>
+    <div class="status-panel-section">
+      <div class="section-title"><span>Vus par</span><span class="count" id="statusViewersCount">0</span></div>
+      <div id="statusViewersList"></div>
+    </div>
+    <div class="status-panel-section" id="statusPrivacyEditWrap">
+      <div class="section-title"><span>Confidentialité de ce statut</span></div>
+      <div class="status-privacy">
+        <select id="statusPrivacyEdit" aria-label="Confidentialité de ce statut">
+          <option value="all">Tout le monde</option>
+          <option value="except">Tout le monde sauf…</option>
+          <option value="only">Ne partager qu'avec…</option>
+        </select>
+        <div class="status-privacy-peers hidden" id="statusPrivacyEditPeers"></div>
+        <button class="text-btn primary" id="statusPrivacySave" type="button">Enregistrer la confidentialité</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- --------------------------------------------------- Création d'un statut -->
+<div class="modal-backdrop hidden" id="statusComposer">
+  <div class="status-compose">
+    <header class="status-compose-head">
+      <button class="icon-btn" id="statusComposeClose" type="button" title="Fermer" aria-label="Fermer">✕</button>
+      <span>Nouveau statut</span>
+      <button class="text-btn primary" id="statusPublish" type="button">Publier</button>
+    </header>
+
+    <div class="status-tabs" id="statusTabs">
+      <button class="chip active" data-status-tab="text" type="button">Texte</button>
+      <button class="chip" data-status-tab="image" type="button">Photo</button>
+      <button class="chip" data-status-tab="video" type="button">Vidéo</button>
+    </div>
+
+    <div class="status-stage">
+      <div class="status-text-preview" id="statusTextPreview">
+        <textarea id="statusTextInput" rows="4" maxlength="700" placeholder="Tapez un statut"></textarea>
+        <div class="status-colors" id="statusColors"></div>
+      </div>
+
+      <div class="status-media-preview hidden" id="statusMediaPreview">
+        <img id="statusImagePreview" class="hidden" alt="Aperçu de la photo">
+        <video id="statusVideoPreview" class="hidden" controls playsinline></video>
+        <button class="text-btn" id="statusPickFile" type="button">Choisir un fichier</button>
+      </div>
+
+      <input id="statusCaption" type="text" maxlength="700" placeholder="Légende (facultatif)" autocomplete="off">
+
+      <div class="status-privacy">
+        <label for="statusPrivacy">Qui peut voir ce statut ?</label>
+        <select id="statusPrivacy">
+          <option value="all">Tout le monde</option>
+          <option value="except">Tout le monde sauf…</option>
+          <option value="only">Ne partager qu'avec…</option>
+        </select>
+        <div class="status-privacy-peers hidden" id="statusPrivacyPeers"></div>
+      </div>
+
+      <input id="statusFileInput" type="file" hidden>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------- Menu du contact -->
+<div class="modal-backdrop hidden" id="contactMenu">
+  <div class="modal menu-modal" role="dialog" aria-modal="true">
+          <div class="menu-avatar avatar" id="menuAvatar" title="Afficher la photo de profil"></div>
+    <h2 id="menuName">Contact</h2>
+    <button class="menu-row" id="menuViewProfile" type="button">
+      <span>Voir le profil<small>Afficher la photo et les informations du contact</small></span>
+    </button>
+    <button class="menu-row" id="menuShared" type="button">
+      <span>Médias, liens et documents<small>Tout ce qui a été partagé dans cette discussion</small></span>
+    </button>
+    <button class="menu-row" id="menuRename" type="button">
+      <span>Renommer le contact</span>
+    </button>
+    <button class="menu-row" id="menuBlockChat" type="button">
+      <span>Bloquer ce contact<small>Il ne peut plus vous écrire ni vous appeler</small></span>
+      <span class="switch" id="switchChat"></span>
+    </button>
+    <button class="menu-row" id="menuBlockStatus" type="button">
+      <span>Masquer mes statuts<small>Ce contact ne voit pas vos statuts</small></span>
+      <span class="switch" id="switchStatus"></span>
+    </button>
+    <button class="menu-row danger" id="menuClear" type="button">
+      <span>Effacer la discussion<small>Les messages disparaissent sur ce poste uniquement</small></span>
+    </button>
+    <button class="menu-row danger" id="menuDelete" type="button">
+      <span>Supprimer la discussion<small>Messages, fichiers et historique d'appels de ce contact</small></span>
+    </button>
+    <div class="modal-actions">
+      <button class="text-btn" id="menuClose" type="button">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---------------------------------------------------------------- Modale -->
+<div class="modal-backdrop hidden" id="modal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h2 id="modalTitle">Modifier le nom</h2>
+    <p id="modalText"></p>
+    <input id="modalInput" maxlength="60" autocomplete="off">
+    <div class="modal-actions">
+      <button class="text-btn" id="modalCancel" type="button">Annuler</button>
+      <button class="text-btn primary" id="modalSave" type="button">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------ Mon profil -->
+<div class="modal-backdrop hidden" id="profileModal">
+  <div class="modal profile-modal" role="dialog" aria-modal="true">
+    <button class="icon-btn profile-close" id="profileClose" type="button" aria-label="Fermer">✕</button>
+    <div class="profile-avatar avatar" id="profileAvatar" title="Afficher la photo"></div>
+    <h2 class="profile-name" id="profileName">Mon profil</h2>
+    <p class="profile-hint">Cliquez sur la photo pour l'afficher en grand.</p>
+    <button class="menu-row" id="profileChangeAvatar" type="button"><span>Changer la photo de profil</span></button>
+    <button class="menu-row" id="profileRename" type="button"><span>Modifier mon nom</span></button>
+    <div class="profile-theme">
+      <span>Thème de l'application</span>
+      <div class="theme-switch" id="themeSwitch">
+        <button type="button" data-theme="light">Clair</button>
+        <button type="button" data-theme="dark">Sombre</button>
+      </div>
+    </div>
+
+    <div class="profile-langs">
+      <div class="section-title"><span>Langues et traduction</span><span class="translation-state" id="translationState">—</span></div>
+      <label class="lang-field">
+        <span>Ma langue</span>
+        <select id="sourceLangSelect" aria-label="Ma langue"></select>
+      </label>
+      <label class="lang-field">
+        <span>Langue de traduction</span>
+        <select id="targetLangSelect" aria-label="Langue de traduction"></select>
+      </label>
+      <button class="menu-row" id="openLanguagesBtn" type="button">
+        <span>Gérer les langues hors ligne<small id="translationEngineHint">Argos Translate · modèles à installer</small></span>
+      </button>
+      <button class="menu-row" id="clearTranslationCacheBtn" type="button">
+        <span>Vider le cache de traduction<small id="translationCacheHint">0 traduction en cache</small></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------------ Gestion des langues -->
+<div class="modal-backdrop hidden" id="translationModal">
+  <div class="modal translation-modal" role="dialog" aria-modal="true">
+    <button class="icon-btn profile-close" id="translationClose" type="button" aria-label="Fermer">✕</button>
+    <h2>Langues hors ligne</h2>
+    <p class="modal-note">Les modèles sont téléchargés une fois puis la traduction fonctionne sans Internet.</p>
+    <div class="translation-engine" id="translationEngine">
+      <span class="translation-dot"></span>
+      <span id="translationEngineText">Vérification du moteur…</span>
+    </div>
+    <details class="translation-paths">
+      <summary>Emplacement d'Argos Translate (facultatif)</summary>
+      <p class="translation-paths-note">Laissez vide pour la détection automatique. Indiquez le dossier d'installation d'Argos Translate et, si besoin, le Python qui contient le paquet <code>argostranslate</code>.</p>
+      <label class="lang-field">
+        <span>Dossier Argos Translate</span>
+        <input id="argosPathInput" type="text" spellcheck="false" placeholder="C:\Users\…\Desktop\argos-translate">
+      </label>
+      <label class="lang-field">
+        <span>Exécutable Python</span>
+        <input id="pythonPathInput" type="text" spellcheck="false" placeholder="Détection automatique">
+      </label>
+      <button class="text-btn" id="saveTranslationPathsBtn" type="button">Enregistrer les emplacements</button>
+    </details>
+    <div class="translation-progress hidden" id="translationProgress">
+      <div class="translation-progress-head"><span id="translationProgressLabel">Téléchargement…</span><span id="translationProgressValue">0 %</span></div>
+      <div class="translation-bar"><i id="translationBar"></i></div>
+      <button class="text-btn" id="translationCancelBtn" type="button">Annuler le téléchargement</button>
+    </div>
+    <div class="shared-tabs">
+      <button class="chip active" data-translation-tab="installed" type="button">Installées</button>
+      <button class="chip" data-translation-tab="available" type="button">Disponibles</button>
+    </div>
+    <div class="translation-body" id="translationBody"></div>
+    <p class="translation-note" id="translationNote"></p>
+  </div>
+</div>
+
+<!-- ------------------------------------------------ Aperçu de traduction -->
+<div class="modal-backdrop hidden" id="translatePreviewModal">
+  <div class="modal translate-preview" role="dialog" aria-modal="true">
+    <h2>Traduire avant l'envoi</h2>
+    <p class="modal-note" id="translatePreviewLangs">—</p>
+    <div class="translate-block">
+      <span class="translate-label">Texte original</span>
+      <div class="translate-original" id="translateOriginal"></div>
+    </div>
+    <div class="translate-block">
+      <span class="translate-label">Traduction (modifiable)</span>
+      <textarea id="translateText" rows="5"></textarea>
+    </div>
+    <div class="modal-actions translate-actions">
+      <button class="text-btn" id="translateRestore" type="button">Revenir à l'original</button>
+      <button class="text-btn" id="translateCancel" type="button">Annuler</button>
+      <button class="text-btn primary" id="translateSend" type="button">Envoyer la traduction</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---------------------------------------------------- Profil d'un contact -->
+<div class="modal-backdrop hidden" id="peerProfileModal">
+  <div class="modal profile-modal" role="dialog" aria-modal="true">
+    <button class="icon-btn profile-close" id="peerProfileClose" type="button" aria-label="Fermer">✕</button>
+    <div class="profile-avatar avatar" id="peerProfileAvatar" title="Afficher la photo de profil"></div>
+    <h2 class="profile-name" id="peerProfileName">Contact</h2>
+    <p class="profile-hint" id="peerProfileMeta"></p>
+    <button class="menu-row" id="peerProfileMessage" type="button"><span>Envoyer un message</span></button>
+    <button class="menu-row" id="peerProfileCall" type="button"><span>Appel audio</span></button>
+    <button class="menu-row" id="peerProfileVideo" type="button"><span>Appel vidéo</span></button>
+    <button class="menu-row" id="peerProfileRename" type="button"><span>Renommer le contact</span></button>
+  </div>
+</div>
+
+<!-- ------------------------------------------------------------ Transférer -->
+<div class="modal-backdrop hidden" id="forwardModal">
+  <div class="modal menu-modal" role="dialog" aria-modal="true">
+    <h2>Transférer le message</h2>
+    <p class="modal-note">Choisissez une ou plusieurs discussions.</p>
+    <div class="forward-list" id="forwardList"></div>
+    <div class="modal-actions">
+      <button class="text-btn" id="forwardCancel" type="button">Annuler</button>
+      <button class="text-btn primary" id="forwardSend" type="button">Transférer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ------------------------------------------- Médias, liens et documents -->
+<div class="modal-backdrop hidden" id="sharedModal">
+  <div class="modal shared-modal" role="dialog" aria-modal="true">
+    <header class="shared-head">
+      <h2>Médias, liens et documents</h2>
+      <button class="icon-btn" id="sharedClose" type="button" aria-label="Fermer">✕</button>
+    </header>
+    <div class="shared-tabs" id="sharedTabs">
+      <button class="chip active" data-shared="media" type="button">Médias</button>
+      <button class="chip" data-shared="documents" type="button">Documents</button>
+      <button class="chip" data-shared="links" type="button">Liens</button>
+    </div>
+    <div class="shared-body" id="sharedBody"></div>
+  </div>
+</div>
+
+<!-- --------------------------------------------------------------- Caméra -->
+<div class="modal-backdrop hidden" id="cameraModal">
+  <div class="camera-modal" role="dialog" aria-modal="true">
+    <video id="cameraVideo" autoplay playsinline muted></video>
+    <div class="camera-actions">
+      <button class="text-btn" id="cameraCancel" type="button">Annuler</button>
+      <button class="text-btn" id="cameraSwitch" type="button">Changer de caméra</button>
+      <button class="text-btn primary" id="cameraCapture" type="button">Prendre la photo</button>
+    </div>
+  </div>
+</div>
+
+<!-- -------------------------------------------------------------- Sondage -->
+<div class="modal-backdrop hidden" id="pollModal">
+  <div class="modal poll-modal" role="dialog" aria-modal="true">
+    <h2>Créer un sondage</h2>
+    <input id="pollQuestion" type="text" maxlength="300" placeholder="Question du sondage" autocomplete="off">
+    <div class="poll-options-edit" id="pollOptionsEdit"></div>
+    <button class="text-btn" id="pollAddOption" type="button">+ Ajouter une option</button>
+    <div class="modal-actions">
+      <button class="text-btn" id="pollCancel" type="button">Annuler</button>
+      <button class="text-btn primary" id="pollSend" type="button">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<input id="avatarInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+
+<!-- ----------------------------------------------- Menu d'un message -->
+<div class="msg-menu hidden" id="messageMenu" role="menu"></div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
