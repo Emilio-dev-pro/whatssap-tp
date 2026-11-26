@@ -107,4 +107,4 @@ Les améliorations peuvent être proposées sous forme de branches et de pull re
 
 ## Licence
 
-Aucune licence open source n'est déclarée pour le moment. Ne pas réutiliser ou redistribuer le code sans autorisation de son auteur tant qu'une licence n'a pas été ajoutée.
+
